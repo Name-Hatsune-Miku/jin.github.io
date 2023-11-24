@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./jquery-3.5.1.js"></script>
+    <script src="./drilldown.js"></script>
+    <script src="./exporting.js"></script>
+    <script src="./highmaps.js"></script>
+</head>
+
+<body>
+    <div id="container" style="height:800px;"></div>
+    <!-- <div style="color: gainsboro;"></div> -->
+</body>
+<script src="https://code.hcharts.cn/highcharts.js"></script>
+<script>
+    Highcharts.setOptions({
+        lang: {
+            drillUpText: '< 返回 “{series.name}”'
+        }
+    });
+    // 地图数据详见：https://geojson.cn
+    var map = null,
+        geochina = 'https://geojson.cn/data/',
+        getGeoJSON = function (code, callback) {
+            $.getJSON(geochina + code + '.json', function (geojson) {
+                callback(geojson);
+            }, function (err) {
+                console.log(err);
+            });
+        },
+        createMap = function (mapdata) {
+            var data = [];
+            // 随机数据
+            Highcharts.each(mapdata.features, function (md, index) {
+                // 南海诸岛标识不需要填充数据
+                if (md.properties.name === '南海诸岛') {
+                    return;
+                }
+                var tmp = {
+                    name: md.properties.name,
+                    value: Math.floor((Math.random() * 100) + 1) // 生成 1 ~ 100 随机值
+                };
+                // 赋值下钻路径
+                if (md.properties.filename) {
+                    tmp.drilldown = md.properties.filename;
+                }
+                // 文字标签偏移
+                if (md.properties.offset) {
+                    md.properties['hc-middle-x'] = md.properties.offset[0];
+                    md.properties['hc-middle-y'] = md.properties.offset[1];
+                }
+                data.push(tmp);
+            });
+            map = new Highcharts.Map('container', {
+                chart: {
+                    events: {
+                        drilldown: function (e) {
+                            drilldown(e);
+                        },
+                        drillup: function (e) {
+                            map.setTitle({
+                                text: e.seriesOptions.name
+                            });
+                        }
+                    }
+                },
+                title: {
+                    text: '中国地图'
+                },
+                subtitle: {
+                    useHTML: true,
+                    text: '地图数据文件路径详见 <a href="https://geojson.cn" target="_blank">GeoJSON.cn</a>'
+                },
+                mapView: {
+                    projection: {
+                        name: 'WebMercator'
+                    }
+                },
+                mapNavigation: {
+                    enabled: true,
+                    buttonOptions: {
+                        verticalAlign: 'bottom'
+                    }
+                },
+                plotOptions: {
+                    map: {
+                        borderColor: 'gainsboro',
+                        borderWidth: 0.5,
+                    }
+                },
+                tooltip: {
+                    useHTML: true,
+                    headerFormat: '<table><tr><th colspan="2">{name}</th></tr>',
+                    pointFormatter: function () {
+                        let properties = this.properties,
+                            counter = 0,
+                            str = '';
+                        for (let key in properties) {
+                            if (counter > 10) {
+                                str += '<tr><td colspan="2">更多属性请点击区块查看详情</td</tr>'
+                                break;
+                            }
+                            str += '<tr><td>' + key + '</td><td>' + properties[key] + '</td></tr>';
+                        }
+                        return str;
+                    },
+                    footerFormat: '</table>'
+                },
+                legend: {
+                    enabled: false
+                },
+                series: [{
+                    data: data,
+                    mapData: mapdata,
+                    joinBy: 'name',
+                    name: '中国',
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.name}',
+                        style: {
+                            fontSize: '10px'
+                        }
+                    },
+                    states: {
+                        hover: {
+                            color: '#a4edba'
+                        }
+                    }
+                }]
+            });
+        },
+        drilldown = function (event) {
+            map.tooltip.hide();
+            // 异步下钻
+            if (event.point.drilldown) {
+                var pointName = event.point.properties.fullname;
+                map.showLoading('下钻中，请稍后...');
+                getGeoJSON(event.point.drilldown, data => {
+                    data = Highcharts.geojson(data);
+                    Highcharts.each(data, function (d) {
+                        if (d.properties.filename) {
+                            d.drilldown = d.properties.filename;
+                        }
+                        if (d.properties.offset) {
+                            d.properties['hc-middle-x'] = d.properties.offset[0];
+                            d.properties['hc-middle-y'] = d.properties.offset[1];
+                        }
+                        d.value = Math.floor((Math.random() * 100) + 1); // 生成 1 ~ 100 随机值
+                    });
+                    map.hideLoading();
+                    map.addSeriesAsDrilldown(event.point, {
+                        name: event.point.name,
+                        data: data,
+                        dataLabels: {
+                            style: {
+                                fontSize: '10px'
+                            },
+                            enabled: true,
+                            format: '{point.name}'
+                        }
+                    });
+                    map.setTitle({
+                        text: pointName
+                    });
+                })
+            }
+        };
+    // 渲染中国地图
+    // 九段线的形式是将 china 修改为 100000
+    getGeoJSON('china', function (geojson) {
+        createMap(geojson);
+    });
+
+</script>
+
+</html>

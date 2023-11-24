@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Swiper demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Link Swiper's CSS -->
+    <link rel="stylesheet" href="./swiper-bundle.css" />
+
+    <!-- Demo styles -->
+    <style>
+        /*   html,
+        body {
+            position: relative;
+            height: 303px;
+        }
+
+        body {
+            background: #eee;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        } */
+
+        .swiper {
+            width: 1235px;
+            height: 303px;
+            position: relative;
+        }
+
+        .swiper-slide {
+            text-align: center;
+            font-size: 18px;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* @media (max-width: 760px) {
+            .swiper-button-next {
+                right: 20px;
+                transform: rotate(90deg);
+            }
+
+            .swiper-button-prev {
+                left: 20px;
+                transform: rotate(90deg);
+            }
+        } */
+
+        /* .swiper-pagination {
+            width: 60%;
+            height: 65px;
+            display: flex;
+            justify-content: flex-end;
+            align-content: space-between;
+        } */
+        .swiper-actions {
+            width: 595px;
+            height: 69px;
+            position: absolute;
+            display: flex;
+            justify-content: space-around;
+            position: absolute;
+            right: 78px;
+            z-index: 98;
+        }
+
+        .swiper-action {
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .swiper-pagination-fraction,
+        .swiper-pagination-custom,
+        .swiper-horizontal>.swiper-pagination-bullets,
+        .swiper-pagination-bullets.swiper-pagination-horizontal {
+            width: 52%;
+        }
+
+        .swiper-pagination-fraction,
+        .swiper-pagination-custom,
+        .swiper-horizontal>.swiper-pagination-bullets,
+        .swiper-pagination-bullets.swiper-pagination-horizontal {
+            left: unset;
+            bottom: 25px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Swiper -->
+    <div class="swiper">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide"><img
+                    src="https://webstatic.mihoyo.com/upload/contentweb/2023/03/08/3b96c6c4f3b4d265f2ba64e053753ce6_4749531332506649085.png"
+                    alt=""></div>
+            <div class="swiper-slide"><img
+                    src="https://webstatic.mihoyo.com/upload/contentweb/2022/08/12/e1711495a7b803711e0fa1907d665551_7518678854448681603.png"
+                    alt=""></div>
+            <div class="swiper-slide"><img
+                    src="https://uploadstatic.mihoyo.com/contentweb/20220121/2022012116375784415.jpg" alt=""></div>
+            <div class="swiper-slide"><img
+                    src="https://uploadstatic.mihoyo.com/contentweb/20210721/2021072119142826586.jpg" alt=""></div>
+            <div class="swiper-slide"><img
+                    src="https://uploadstatic.mihoyo.com/contentweb/20210201/2021020114084334134.jpg" alt=""></div>
+        </div>
+        <!-- <div class="swiper-pagination"> -->
+        <div class="swiper-actions">
+            <div class="swiper-action"><img
+                    src="https://webstatic.mihoyo.com/upload/contentweb/2023/03/08/6945dd91b7461711a9006e794c7a28e6_850712920918882297.png">
+            </div>
+            <div class="swiper-action"><img
+                    src="https://webstatic.mihoyo.com/upload/contentweb/2022/08/12/5cc9e7d9e5b59529f786801c97414e56_8642774847250475530.png">
+            </div>
+            <div class="swiper-action"><img
+                    src="https://uploadstatic.mihoyo.com/contentweb/20220121/2022012116380715763.jpg"></div>
+            <div class="swiper-action"><img
+                    src="https://uploadstatic.mihoyo.com/contentweb/20210721/2021072119143479921.jpg"></div>
+            <div class="swiper-action active"><img
+                    src="https://uploadstatic.mihoyo.com/contentweb/20210201/2021020114084526332.jpg"></div>
+        </div>
+        <!-- </div> -->
+    </div>
+
+    <!-- Swiper JS -->
+    <script src="./swiper-bundle.js"></script>
+
+    <!-- Initialize Swiper -->
+    <script>
+        var swiper = new Swiper('.swiper', {
+            spaceBetween: 30,
+            loop: true,
+            slidesPerView: 1,
+            direction: getDirection(),
+            on: {
+                resize: function () {
+                    swiper.changeDirection(getDirection());
+                },
+            },
+            pagination: {
+                el: '.swiper-actions',
+                clickable: true,
+                renderBullet: function (index, className) {
+                    switch (index) {
+                        case 0: text = `<img src = "https://webstatic.mihoyo.com/upload/contentweb/2023/03/08/6945dd91b7461711a9006e794c7a28e6_850712920918882297.png"> `; break;
+                        case 1: text = `<img
+                            src = "https://webstatic.mihoyo.com/upload/contentweb/2022/08/12/5cc9e7d9e5b59529f786801c97414e56_8642774847250475530.png" > `; break;
+                        case 2: text = `<img
+                            src = "https://uploadstatic.mihoyo.com/contentweb/20220121/2022012116380715763.jpg" >`; break;
+                        case 3: text = `<img
+                        src="https://uploadstatic.mihoyo.com/contentweb/20210721/2021072119143479921.jpg">`; break;
+                        case 4: text = `<img
+                        src="https://uploadstatic.mihoyo.com/contentweb/20210201/2021020114084526332.jpg">`; break;
+                    }
+                    return '<span class="' + className + '">' + text + '</span>';
+                },
+            },
+        }
+        );
+
+        function getDirection() {
+            var windowWidth = window.innerWidth;
+            var direction = window.innerWidth <= 760 ? 'vertical' : 'horizontal';
+
+            return direction;
+        }
+    </script>
+</body>
+
+</html>
